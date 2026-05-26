@@ -247,10 +247,14 @@
     <button class="tab active" onclick="switchTab('overview')">Overview</button>
     <button class="tab" onclick="switchTab('yearmonth')">Year / Month</button>
     <button class="tab" onclick="switchTab('all')">All Tasks</button>
+    <button class="tab" onclick="switchTab('roadmap')" style="display:flex;align-items:center;gap:5px">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Roadmap
+    </button>
   </div>
 
   <!-- FILTERS -->
-  <div class="filters-row">
+  <div class="filters-row" id="filters-row">
     <span class="filter-label">Status:</span>
     <div class="filter-pills" id="status-pills">
       <span class="pill active" data-status="all" onclick="filterStatus('all')">All</span>
@@ -430,8 +434,10 @@ function updateKPIs() {
 function switchTab(tab) {
   activeTab = tab;
   document.querySelectorAll('.tab').forEach((el, i) => {
-    el.classList.toggle('active', ['overview','yearmonth','all'][i] === tab);
+    el.classList.toggle('active', ['overview','yearmonth','all','roadmap'][i] === tab);
   });
+  const filtersRow = document.getElementById('filters-row');
+  if (filtersRow) filtersRow.style.display = tab === 'roadmap' ? 'none' : '';
   renderCurrentTab();
 }
 
@@ -455,6 +461,7 @@ function renderCurrentTab() {
   if (allTasks.length === 0) return;
   if (activeTab === 'overview') renderOverview();
   else if (activeTab === 'yearmonth') renderYearMonth();
+  else if (activeTab === 'roadmap') renderRoadmap();
   else renderAllTasks();
 }
 
@@ -696,6 +703,173 @@ function changeYear(y) {
 function changeMonth(m) {
   selectedMonth = m;
   renderYearMonth();
+}
+
+const ROADMAP_INITIATIVES = [
+  {
+    num: 1, done: true,
+    title: 'Customer Tier Baselines',
+    goal: 'Establish standardized, capacity-backed customer tier definitions',
+    requirement: 'Define the expected resource consumption profile for each customer tier (Small, Medium, Large), including compute, memory, and throughput.',
+    why: 'Resource Fairness — Prevents high-consumption tenants from disproportionately impacting shared platform resources.',
+    metric: 'Cost-per-Tenant — The average infrastructure cost required to support a customer within a given tier.',
+    details: [
+      { label: 'Small',  specs: '2 vCPUs · 8 GB RAM · 1 TB storage/month' },
+      { label: 'Medium', specs: '4 vCPUs · 16 GB RAM · 5 TB storage/month' },
+      { label: 'Large',  specs: '8+ vCPUs · 32+ GB RAM · 20+ TB storage/month' }
+    ]
+  },
+  {
+    num: 2, done: false,
+    title: 'Microservice Capacity Profiling',
+    goal: 'Achieve predictable and measurable service capacity',
+    requirement: 'Test each microservice under heavy load to determine how much traffic it can safely handle.',
+    why: 'Predictability & Reliability — Clearly defines how many users/requests a service can support and ensures SLAs are maintained during peak traffic.',
+    metric: 'Saturation Point & Error Rate (target < 0.03%)'
+  },
+  {
+    num: 3, done: true,
+    title: 'Autoscaling & Capacity Validation',
+    goal: 'Ensure the system scales reliably and cost-effectively with demand',
+    requirement: 'Validate that autoscaling policies trigger correctly under simulated load spikes and scale down after demand drops.',
+    why: 'Cost Efficiency & Resilience — Avoids over-provisioning while guaranteeing headroom during traffic surges.',
+    metric: 'Scale-out latency and cost-per-scaled-unit'
+  },
+  {
+    num: 4, done: true,
+    title: 'Request vs Infra Capacity Ratio',
+    goal: 'Define a measurable request-to-capacity scaling model',
+    requirement: 'Establish the ratio between incoming request volume and required infrastructure resources to build a predictive scaling model.',
+    why: 'Proactive Scaling — Enables infrastructure teams to provision capacity ahead of demand rather than reactively.',
+    metric: 'Requests-per-vCPU and GB-RAM-per-1k-concurrent-users'
+  },
+  { num: 5,  done: false, title: 'Geo-Distributed Traffic & CDN Validation',      goal: 'Ensure low-latency delivery across all regions — New York, London, Mumbai' },
+  { num: 6,  done: false, title: 'Database Load & Query Performance Baselines',   goal: 'Establish read/write throughput limits under concurrent tenant load' },
+  { num: 7,  done: false, title: 'Multi-Tenant Isolation & Noisy-Neighbour Tests', goal: 'Confirm workload isolation between tenants under shared infrastructure' },
+  { num: 8,  done: false, title: 'API Rate Limiting & Throttle Validation',       goal: 'Define and enforce per-tenant API quotas at the gateway layer' },
+  { num: 9,  done: false, title: 'Disaster Recovery & Failover SLA Testing',      goal: 'Verify RTO/RPO targets are met during simulated infrastructure failures' },
+  { num: 10, done: false, title: 'Cost Anomaly Detection & Budget Guardrails',    goal: 'Alert and auto-remediate when cloud spend exceeds defined thresholds' },
+  { num: 11, done: false, title: 'Performance Regression CI Pipeline',            goal: 'Catch performance regressions automatically on every code merge' }
+];
+
+function renderRoadmap() {
+  const content = document.getElementById('content');
+  const completed = ROADMAP_INITIATIVES.filter(i => i.done);
+  const pending   = ROADMAP_INITIATIVES.filter(i => !i.done);
+
+  content.innerHTML = `
+    <!-- HEADER -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 24px;margin-bottom:24px;display:flex;align-items:flex-start;gap:18px">
+      <div style="flex:1">
+        <div style="font-size:11px;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">Performance Requirements</div>
+        <div style="font-size:20px;font-weight:800;color:var(--text);line-height:1.3">Platform Stability Roadmap</div>
+        <div style="font-size:13px;color:var(--text3);margin-top:6px">11 key initiatives · High Priority · Critical Foundations</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;font-style:italic">Focus: Reliability, Uptime, and Cost Control</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;flex-shrink:0">
+        <a href="https://performance-requirements-p45ml6a.gamma.site/" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:var(--accent);color:#fff;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;transition:background 0.2s" onmouseover="this.style.background='var(--accent2)'" onmouseout="this.style.background='var(--accent)'">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          View Full Roadmap
+        </a>
+        <div style="font-size:12px;color:var(--text3);text-align:right">
+          <span style="color:var(--closed);font-weight:700">${completed.length}</span> completed &nbsp;·&nbsp; <span style="color:var(--text2);font-weight:700">${pending.length}</span> remaining
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRESS BAR -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:28px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:13px;font-weight:600;color:var(--text)">Overall Progress</span>
+        <span style="font-size:13px;font-weight:700;color:var(--closed)">${Math.round(completed.length/11*100)}%</span>
+      </div>
+      <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden">
+        <div style="height:100%;background:linear-gradient(90deg,var(--closed),#4ade80);border-radius:4px;width:${Math.round(completed.length/11*100)}%;transition:width 0.8s ease"></div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+        ${ROADMAP_INITIATIVES.map(i => `
+          <div title="${i.num}. ${i.title}" style="width:28px;height:28px;border-radius:6px;background:${i.done?'var(--closed)':'var(--surface2)'};border:1px solid ${i.done?'var(--closed)':'var(--border)'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:${i.done?'#000':'var(--text3)'};cursor:default">
+            ${i.done ? '✓' : i.num}
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- COMPLETED SECTION -->
+    <div style="margin-bottom:32px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+        <div style="width:4px;height:22px;background:var(--closed);border-radius:2px"></div>
+        <div>
+          <div style="font-size:16px;font-weight:800;color:var(--text)">Completed Initiatives</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:1px">${completed.length} of 11 delivered</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        ${completed.map(i => `
+          <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--closed);border-radius:12px;overflow:hidden">
+            <!-- Title bar -->
+            <div style="padding:16px 20px 12px;display:flex;align-items:flex-start;gap:14px">
+              <div style="width:32px;height:32px;border-radius:8px;background:var(--closed);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#000;flex-shrink:0">${i.num}</div>
+              <div style="flex:1">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                  <span style="font-size:15px;font-weight:800;color:var(--text)">${i.title}</span>
+                  <span style="font-size:10px;padding:2px 8px;border-radius:4px;background:var(--closed-bg);color:var(--closed);font-weight:700">✓ Done</span>
+                </div>
+                <div style="font-size:13px;color:var(--accent2);font-weight:500">${i.goal}</div>
+              </div>
+            </div>
+            <!-- Detail -->
+            <div style="border-top:1px solid var(--border);padding:14px 20px;display:flex;flex-direction:column;gap:12px">
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px">Requirement</div>
+                <div style="font-size:13px;color:var(--text2);line-height:1.5">${i.requirement || '—'}</div>
+              </div>
+              ${i.why ? `
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px">Why It Matters</div>
+                <div style="font-size:13px;color:var(--text2);line-height:1.5">${i.why}</div>
+              </div>` : ''}
+              ${i.metric ? `
+              <div style="background:rgba(34,197,94,0.07);border-radius:8px;padding:10px 14px;display:flex;gap:8px;align-items:flex-start">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--closed)" stroke-width="2.5" style="margin-top:1px;flex-shrink:0"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                <div><span style="font-size:11px;font-weight:700;color:var(--closed)">KEY METRIC &nbsp;</span><span style="font-size:13px;color:var(--text2)">${i.metric}</span></div>
+              </div>` : ''}
+              ${i.details ? `
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Tier Specifications</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap">
+                  ${i.details.map((d,idx) => `
+                    <div style="flex:1;min-width:120px;padding:10px 14px;border-radius:8px;background:${['rgba(59,130,246,0.1)','rgba(245,158,11,0.1)','rgba(34,197,94,0.1)'][idx]};border:1px solid ${['rgba(59,130,246,0.2)','rgba(245,158,11,0.2)','rgba(34,197,94,0.2)'][idx]}">
+                      <div style="font-size:12px;font-weight:700;color:${['var(--inprogress)','var(--new)','var(--closed)'][idx]};margin-bottom:4px">${d.label}</div>
+                      <div style="font-size:11px;color:var(--text2)">${d.specs}</div>
+                    </div>`).join('')}
+                </div>
+              </div>` : ''}
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- PENDING SECTION -->
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+        <div style="width:4px;height:22px;background:var(--text3);border-radius:2px"></div>
+        <div>
+          <div style="font-size:16px;font-weight:800;color:var(--text)">Upcoming Initiatives</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:1px">${pending.length} remaining</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px">
+        ${pending.map(i => `
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start">
+            <div style="width:28px;height:28px;border-radius:7px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text3);flex-shrink:0">${i.num}</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px">${i.title}</div>
+              <div style="font-size:12px;color:var(--text3);line-height:1.4">${i.goal}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>
+  `;
 }
 
 function renderAllTasks() {
