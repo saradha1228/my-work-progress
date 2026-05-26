@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QA Work Progress — 2025 to 2026</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d2e;
+      --surface2: #222539;
+      --border: #2e3250;
+      --accent: #6366f1;
+      --accent2: #818cf8;
+      --new: #f59e0b;
+      --new-bg: rgba(245,158,11,0.12);
+      --inprogress: #3b82f6;
+      --inprogress-bg: rgba(59,130,246,0.12);
+      --closed: #22c55e;
+      --closed-bg: rgba(34,197,94,0.12);
+      --high: #ef4444;
+      --medium: #f59e0b;
+      --low: #94a3b8;
+      --text: #e2e8f0;
+      --text2: #94a3b8;
+      --text3: #64748b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; min-height: 100vh; }
+
+    /* HEADER */
+    .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .logo { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), #a855f7); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .header-title { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+    .header-sub { font-size: 12px; color: var(--text3); margin-top: 1px; }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); font-size: 13px; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+    .btn:hover { border-color: var(--accent); color: var(--accent2); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+    .btn svg { width: 14px; height: 14px; }
+    .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* MAIN */
+    .main { max-width: 1400px; margin: 0 auto; padding: 24px 28px; }
+
+    /* KPI CARDS */
+    .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; }
+    .kpi-label { font-size: 12px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; }
+    .kpi-value { font-size: 36px; font-weight: 800; letter-spacing: -1px; }
+    .kpi-value.total { color: var(--text); }
+    .kpi-value.new { color: var(--new); }
+    .kpi-value.inprogress { color: var(--inprogress); }
+    .kpi-value.closed { color: var(--closed); }
+    .kpi-bar { height: 3px; background: var(--border); border-radius: 2px; margin-top: 12px; overflow: hidden; }
+    .kpi-bar-fill { height: 100%; border-radius: 2px; transition: width 0.8s ease; }
+    .kpi-bar-fill.new { background: var(--new); }
+    .kpi-bar-fill.inprogress { background: var(--inprogress); }
+    .kpi-bar-fill.closed { background: var(--closed); }
+    .kpi-bar-fill.total { background: linear-gradient(90deg, var(--accent), #a855f7); }
+
+    /* TABS */
+    .tabs { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 4px; margin-bottom: 24px; width: fit-content; }
+    .tab { padding: 8px 18px; border-radius: 7px; font-size: 13px; font-weight: 500; color: var(--text3); cursor: pointer; transition: all 0.2s; border: none; background: transparent; }
+    .tab.active { background: var(--accent); color: #fff; }
+    .tab:hover:not(.active) { color: var(--text); background: var(--surface2); }
+
+    /* FILTERS ROW */
+    .filters-row { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
+    .filter-label { font-size: 12px; color: var(--text3); font-weight: 500; }
+    .filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .pill { padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .pill:hover { border-color: var(--accent); color: var(--accent2); }
+    .pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .pill.new.active { background: var(--new); border-color: var(--new); color: #000; }
+    .pill.inprogress.active { background: var(--inprogress); border-color: var(--inprogress); color: #fff; }
+    .pill.closed.active { background: var(--closed); border-color: var(--closed); color: #000; }
+    .search-box { margin-left: auto; position: relative; }
+    .search-box input { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px 7px 34px; color: var(--text); font-size: 13px; width: 220px; outline: none; transition: border-color 0.2s; }
+    .search-box input:focus { border-color: var(--accent); }
+    .search-box .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text3); width: 14px; height: 14px; }
+
+    /* YEAR/MONTH VIEW */
+    .year-section { margin-bottom: 32px; }
+    .year-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; cursor: pointer; user-select: none; }
+    .year-badge { font-size: 22px; font-weight: 800; color: var(--accent2); letter-spacing: -0.5px; }
+    .year-count { font-size: 12px; color: var(--text3); background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 2px 10px; }
+    .year-line { flex: 1; height: 1px; background: var(--border); }
+    .year-chevron { color: var(--text3); transition: transform 0.3s; }
+    .year-chevron.open { transform: rotate(90deg); }
+    .month-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+    .month-section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .month-header { padding: 12px 16px; background: var(--surface2); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); cursor: pointer; }
+    .month-name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .month-stats { display: flex; gap: 8px; align-items: center; }
+    .month-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .month-dot.new { background: var(--new); }
+    .month-dot.inprogress { background: var(--inprogress); }
+    .month-dot.closed { background: var(--closed); }
+    .month-count { font-size: 12px; color: var(--text3); }
+    .month-tasks { padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+    .month-tasks.hidden { display: none; }
+
+    /* TASK CARD */
+    .task-card { padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+    .task-card:hover { border-color: var(--accent); background: rgba(99,102,241,0.05); }
+    .task-id-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .task-id { font-size: 11px; font-weight: 600; color: var(--accent2); font-family: monospace; }
+    .status-badge { font-size: 10px; padding: 2px 7px; border-radius: 4px; font-weight: 600; }
+    .status-badge.new { background: var(--new-bg); color: var(--new); }
+    .status-badge.inprogress { background: var(--inprogress-bg); color: var(--inprogress); }
+    .status-badge.closed { background: var(--closed-bg); color: var(--closed); }
+    .priority-badge { font-size: 10px; padding: 2px 7px; border-radius: 4px; font-weight: 600; margin-left: auto; }
+    .priority-badge.high { background: rgba(239,68,68,0.12); color: var(--high); }
+    .priority-badge.medium { background: rgba(245,158,11,0.12); color: var(--medium); }
+    .priority-badge.low { background: rgba(148,163,184,0.12); color: var(--low); }
+    .task-name { font-size: 12px; font-weight: 500; color: var(--text); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .task-meta { display: flex; align-items: center; gap: 8px; margin-top: 7px; }
+    .task-meta-item { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text3); }
+    .task-meta-item svg { width: 11px; height: 11px; }
+    .subitem-bar { margin-top: 8px; }
+    .subitem-progress-text { font-size: 10px; color: var(--text3); margin-bottom: 3px; }
+    .subitem-progress-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .subitem-progress-fill { height: 100%; background: var(--inprogress); border-radius: 2px; transition: width 0.5s; }
+
+    /* ALL TASKS TABLE VIEW */
+    .table-container { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead tr { border-bottom: 1px solid var(--border); }
+    thead th { padding: 12px 16px; text-align: left; color: var(--text3); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+    tbody tr { border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(99,102,241,0.06); }
+    tbody td { padding: 11px 16px; vertical-align: middle; }
+    .td-id { font-family: monospace; font-size: 12px; color: var(--accent2); font-weight: 600; white-space: nowrap; }
+    .td-name { max-width: 400px; }
+    .td-name-text { font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 380px; display: block; }
+    .td-date { color: var(--text3); white-space: nowrap; font-size: 12px; }
+
+    /* MODAL */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 500; display: flex; align-items: flex-start; justify-content: flex-end; padding: 16px; }
+    .modal-backdrop.hidden { display: none; }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; width: 520px; max-height: calc(100vh - 32px); overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.5); animation: slideIn 0.25s ease; }
+    @keyframes slideIn { from { transform: translateX(30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .modal-header { padding: 20px 22px 14px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--surface); z-index: 1; }
+    .modal-close { float: right; background: none; border: none; color: var(--text3); cursor: pointer; font-size: 18px; line-height: 1; margin-left: 12px; }
+    .modal-close:hover { color: var(--text); }
+    .modal-id { font-family: monospace; font-size: 12px; color: var(--accent2); font-weight: 700; }
+    .modal-title { font-size: 16px; font-weight: 700; margin-top: 8px; line-height: 1.4; color: var(--text); }
+    .modal-body { padding: 18px 22px; }
+    .modal-section { margin-bottom: 20px; }
+    .modal-section-title { font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; }
+    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .modal-field { }
+    .modal-field-label { font-size: 11px; color: var(--text3); margin-bottom: 3px; }
+    .modal-field-value { font-size: 13px; font-weight: 500; color: var(--text); }
+    .modal-desc { font-size: 13px; color: var(--text2); line-height: 1.6; background: var(--surface2); border-radius: 8px; padding: 12px; border-left: 3px solid var(--accent); }
+    .subitem-list { display: flex; flex-direction: column; gap: 7px; }
+    .subitem-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; }
+    .subitem-state-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+    .subitem-state-dot.done { background: var(--closed); }
+    .subitem-state-dot.inprogress { background: var(--inprogress); }
+    .subitem-state-dot.notstarted { background: var(--text3); }
+    .subitem-item-text { font-size: 12px; color: var(--text2); flex: 1; line-height: 1.4; }
+    .subitem-item-id { font-size: 10px; color: var(--text3); font-family: monospace; white-space: nowrap; }
+    .subitem-state-label { font-size: 10px; color: var(--text3); white-space: nowrap; }
+
+    /* LOADING STATE */
+    .loading-overlay { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 80px 20px; color: var(--text3); }
+    .loading-spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    .loading-text { font-size: 14px; }
+
+    /* EMPTY STATE */
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
+    .empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-title { font-size: 16px; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 18px; font-size: 13px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); z-index: 1000; transform: translateY(100px); opacity: 0; transition: all 0.3s; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-color: var(--closed); color: var(--closed); }
+    .toast.error { border-color: var(--high); color: var(--high); }
+
+    /* OVERVIEW CHARTS */
+    .overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+    .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+    .chart-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+    .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+    .bar-row { display: flex; align-items: center; gap: 10px; }
+    .bar-label { width: 80px; font-size: 12px; color: var(--text2); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar-track { flex: 1; height: 20px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; justify-content: flex-end; padding-right: 6px; font-size: 11px; font-weight: 600; color: #fff; transition: width 0.7s ease; min-width: 24px; }
+    .pie-chart { display: flex; flex-direction: column; gap: 8px; }
+    .pie-legend-item { display: flex; align-items: center; gap: 10px; }
+    .pie-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+    .pie-legend-label { font-size: 13px; color: var(--text2); flex: 1; }
+    .pie-legend-count { font-size: 13px; font-weight: 600; color: var(--text); }
+    .pie-legend-pct { font-size: 11px; color: var(--text3); width: 36px; text-align: right; }
+
+    @media (max-width: 900px) {
+      .kpi-row { grid-template-columns: repeat(2, 1fr); }
+      .overview-grid { grid-template-columns: 1fr; }
+      .modal { width: 100%; }
+    }
+    @media (max-width: 600px) {
+      .main { padding: 16px; }
+      .header { padding: 12px 16px; }
+      .kpi-row { grid-template-columns: 1fr 1fr; }
+      .month-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <div class="logo">🎯</div>
+    <div>
+      <div class="header-title">QA Work Progress &nbsp;<span style="color:var(--text3);font-weight:400">2025 – 2026</span></div>
+      <div class="header-sub" id="last-updated">Saradha B &nbsp;·&nbsp; QA Chapter</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="btn btn-primary" id="refresh-btn" onclick="loadData()">
+      <span id="refresh-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+      </span>
+      Refresh
+    </button>
+  </div>
+</header>
+
+<main class="main">
+  <!-- KPI CARDS -->
+  <div class="kpi-row" id="kpi-row">
+    <div class="kpi-card"><div class="kpi-label">Total Tasks</div><div class="kpi-value total" id="kpi-total">—</div><div class="kpi-bar"><div class="kpi-bar-fill total" style="width:100%"></div></div></div>
+    <div class="kpi-card"><div class="kpi-label">New / Pending</div><div class="kpi-value new" id="kpi-new">—</div><div class="kpi-bar"><div class="kpi-bar-fill new" id="kpi-new-bar" style="width:0%"></div></div></div>
+    <div class="kpi-card"><div class="kpi-label">In Progress</div><div class="kpi-value inprogress" id="kpi-inprogress">—</div><div class="kpi-bar"><div class="kpi-bar-fill inprogress" id="kpi-inprogress-bar" style="width:0%"></div></div></div>
+    <div class="kpi-card"><div class="kpi-label">Closed / Done</div><div class="kpi-value closed" id="kpi-closed">—</div><div class="kpi-bar"><div class="kpi-bar-fill closed" id="kpi-closed-bar" style="width:0%"></div></div></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('overview')">Overview</button>
+    <button class="tab" onclick="switchTab('yearmonth')">Year / Month</button>
+    <button class="tab" onclick="switchTab('all')">All Tasks</button>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters-row">
+    <span class="filter-label">Status:</span>
+    <div class="filter-pills" id="status-pills">
+      <span class="pill active" data-status="all" onclick="filterStatus('all')">All</span>
+      <span class="pill new" data-status="NotStarted" onclick="filterStatus('NotStarted')">New</span>
+      <span class="pill inprogress" data-status="InProgress" onclick="filterStatus('InProgress')">In Progress</span>
+      <span class="pill closed" data-status="Closed" onclick="filterStatus('Closed')">Closed</span>
+    </div>
+    <span class="filter-label" style="margin-left:12px">Priority:</span>
+    <div class="filter-pills" id="priority-pills">
+      <span class="pill active" data-priority="all" onclick="filterPriority('all')">All</span>
+      <span class="pill" data-priority="High" onclick="filterPriority('High')" style="color:var(--high)">High</span>
+      <span class="pill" data-priority="Medium" onclick="filterPriority('Medium')" style="color:var(--medium)">Medium</span>
+      <span class="pill" data-priority="Low" onclick="filterPriority('Low')">Low</span>
+    </div>
+    <div class="search-box">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" placeholder="Search tasks…" id="search-input" oninput="renderCurrentTab()" />
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="content">
+    <div class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Loading tasks from Kissflow…</div>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-backdrop hidden" id="modal-backdrop" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+      <div class="modal-id" id="modal-id"></div>
+      <div class="modal-title" id="modal-title"></div>
+      <div style="display:flex;gap:8px;margin-top:10px;" id="modal-badges"></div>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const API_LIST = '/api/list';
+const API_DETAIL_BASE = '/api/detail/';
+const HEADERS = { 'Content-Type': 'application/json' };
+const LIST_PAYLOAD = {
+  "Column": ["Status_0001_New","Status_0001_InProgress","Status_0001_Closed"],
+  "LastModifiedAt": new Date().toISOString(),
+  "FilterParam": {},
+  "ViewId": "QA_Chapter_Task_Tracker_assigned_to_me"
+};
+
+let allTasks = [];
+let detailCache = {};
+let activeTab = 'overview';
+let activeStatus = 'all';
+let activePriority = 'all';
+let activeYear = 2026;
+let selectedYear = null;
+let selectedMonth = null;
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function getStatusClass(category) {
+  if (category === 'NotStarted') return 'new';
+  if (category === 'InProgress') return 'inprogress';
+  if (category === 'Closed') return 'closed';
+  return 'new';
+}
+
+function getPriorityClass(p) {
+  if (!p) return 'low';
+  return p.toLowerCase();
+}
+
+function formatDate(str) {
+  if (!str) return '—';
+  const d = new Date(str);
+  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function getYear(task) {
+  const d = task._created_at || task._modified_at;
+  return d ? new Date(d).getFullYear() : 'Unknown';
+}
+
+function getMonthIdx(task) {
+  const d = task._created_at || task._modified_at;
+  return d ? new Date(d).getMonth() : -1;
+}
+
+function filteredTasks() {
+  const q = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+  return allTasks.filter(t => {
+    const year2026Ok = new Date(t._created_at || t._modified_at).getFullYear() === activeYear;
+    const statusOk = activeStatus === 'all' || t._category === activeStatus;
+    const prioOk = activePriority === 'all' || t._priority_name === activePriority;
+    const searchOk = !q || t.Name.toLowerCase().includes(q) || t._item_id.toLowerCase().includes(q) ||
+      (t._status_name || '').toLowerCase().includes(q) || (t.AssignedTo?.Name || '').toLowerCase().includes(q);
+    return year2026Ok && statusOk && prioOk && searchOk;
+  });
+}
+
+async function loadData() {
+  const btn = document.getElementById('refresh-btn');
+  const icon = document.getElementById('refresh-icon');
+  icon.innerHTML = '<div class="spinner"></div>';
+  btn.disabled = true;
+
+  document.getElementById('content').innerHTML = `
+    <div class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Fetching tasks from Kissflow…</div>
+    </div>`;
+
+  try {
+    const res = await fetch(API_LIST, {
+      method: 'POST',
+      headers: HEADERS,
+      body: JSON.stringify({...LIST_PAYLOAD, LastModifiedAt: new Date().toISOString()})
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    allTasks = data.Data || [];
+
+    // Fetch details for all tasks in parallel
+    await fetchAllDetails();
+
+    updateKPIs();
+    renderCurrentTab();
+    document.getElementById('last-updated').textContent = 'Last updated: ' + new Date().toLocaleTimeString('en-IN');
+    showToast('Tasks loaded successfully', 'success');
+  } catch(e) {
+    document.getElementById('content').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">⚠️</div>
+        <div class="empty-title">Failed to load tasks</div>
+        <div style="color:var(--text3);font-size:13px;margin-top:6px">${e.message}</div>
+        <div style="margin-top:12px;font-size:12px;color:var(--text3)">If running from a local file, CORS may be blocked by the browser.<br>Try opening this file via a local server: <code style="color:var(--accent2)">python3 -m http.server 8080</code></div>
+      </div>`;
+    showToast('Failed to load: ' + e.message, 'error');
+  } finally {
+    icon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>`;
+    btn.disabled = false;
+  }
+}
+
+async function fetchAllDetails() {
+  const tasks = allTasks;
+  const fetches = tasks.map(t =>
+    fetch(API_DETAIL_BASE + t._item_id, { headers: HEADERS })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) detailCache[t._item_id] = d; })
+      .catch(() => null)
+  );
+  await Promise.allSettled(fetches);
+}
+
+function updateKPIs() {
+  const total = allTasks.length;
+  const newCount = allTasks.filter(t => t._category === 'NotStarted').length;
+  const inpCount = allTasks.filter(t => t._category === 'InProgress').length;
+  const clCount = allTasks.filter(t => t._category === 'Closed').length;
+  document.getElementById('kpi-total').textContent = total;
+  document.getElementById('kpi-new').textContent = newCount;
+  document.getElementById('kpi-inprogress').textContent = inpCount;
+  document.getElementById('kpi-closed').textContent = clCount;
+  document.getElementById('kpi-new-bar').style.width = total ? (newCount/total*100) + '%' : '0%';
+  document.getElementById('kpi-inprogress-bar').style.width = total ? (inpCount/total*100) + '%' : '0%';
+  document.getElementById('kpi-closed-bar').style.width = total ? (clCount/total*100) + '%' : '0%';
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab').forEach((el, i) => {
+    el.classList.toggle('active', ['overview','yearmonth','all'][i] === tab);
+  });
+  renderCurrentTab();
+}
+
+function filterStatus(s) {
+  activeStatus = s;
+  document.querySelectorAll('#status-pills .pill').forEach(el => {
+    el.classList.toggle('active', el.dataset.status === s);
+  });
+  renderCurrentTab();
+}
+
+function filterPriority(p) {
+  activePriority = p;
+  document.querySelectorAll('#priority-pills .pill').forEach(el => {
+    el.classList.toggle('active', el.dataset.priority === p);
+  });
+  renderCurrentTab();
+}
+
+function renderCurrentTab() {
+  if (allTasks.length === 0) return;
+  if (activeTab === 'overview') renderOverview();
+  else if (activeTab === 'yearmonth') renderYearMonth();
+  else renderAllTasks();
+}
+
+function switchYear(yr) {
+  activeYear = yr;
+  selectedYear = null;
+  selectedMonth = null;
+  updateKPIs();
+  renderCurrentTab();
+}
+
+function renderOverview() {
+  const tasks = filteredTasks();
+  const content = document.getElementById('content');
+
+  const now = new Date();
+  // For 2026 use current month; for 2025 find the latest month that has tasks
+  let focusMonth, focusMonthLabel;
+  if (activeYear === 2026) {
+    focusMonth = now.getMonth();
+    focusMonthLabel = MONTHS[focusMonth] + ' 2026';
+  } else {
+    const months2025 = tasks.map(t => new Date(t._created_at || t._modified_at).getMonth());
+    focusMonth = months2025.length ? Math.max(...months2025) : now.getMonth();
+    focusMonthLabel = MONTHS[focusMonth] + ' 2025';
+  }
+
+  const activeTasks = tasks.filter(t => t._category === 'InProgress');
+
+  const thisMonthTasks = tasks.filter(t => {
+    const d = new Date(t._created_at || t._modified_at);
+    return d.getMonth() === focusMonth;
+  });
+  const thisMonthActive = thisMonthTasks.filter(t => t._category === 'InProgress');
+
+  const total = tasks.length;
+  const newCount = tasks.filter(t => t._category === 'NotStarted').length;
+  const inpCount = activeTasks.length;
+  const clCount = tasks.filter(t => t._category === 'Closed').length;
+
+  // Month breakdown for the selected year
+  const byMonth = {};
+  tasks.forEach(t => {
+    const m = new Date(t._created_at || t._modified_at).getMonth();
+    if (!byMonth[m]) byMonth[m] = { new: 0, active: 0, closed: 0 };
+    if (t._category === 'NotStarted') byMonth[m].new++;
+    else if (t._category === 'InProgress') byMonth[m].active++;
+    else byMonth[m].closed++;
+  });
+  const monthKeys = Object.keys(byMonth).map(Number).sort((a, b) => a - b);
+  const maxMonthTotal = Math.max(...monthKeys.map(m => byMonth[m].new + byMonth[m].active + byMonth[m].closed), 1);
+
+  content.innerHTML = `
+    <!-- YEAR TOGGLE -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:24px">
+      <span style="font-size:12px;color:var(--text3);font-weight:600;margin-right:4px">YEAR</span>
+      <button onclick="switchYear(2026)" style="padding:7px 20px;border-radius:8px;border:1px solid ${activeYear===2026?'var(--accent)':'var(--border)'};background:${activeYear===2026?'var(--accent)':'var(--surface2)'};color:${activeYear===2026?'#fff':'var(--text2)'};font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s">2026</button>
+      <button onclick="switchYear(2025)" style="padding:7px 20px;border-radius:8px;border:1px solid ${activeYear===2025?'var(--accent)':'var(--border)'};background:${activeYear===2025?'var(--accent)':'var(--surface2)'};color:${activeYear===2025?'#fff':'var(--text2)'};font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s">2025</button>
+    </div>
+
+    <!-- SUMMARY ROW -->
+    <div style="display:grid;grid-template-columns:${activeYear === 2026 ? 'repeat(3,1fr)' : 'repeat(2,1fr)'};gap:14px;margin-bottom:28px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px">${focusMonthLabel} Tasks</div>
+        <div style="font-size:28px;font-weight:800;color:var(--accent2)">${thisMonthTasks.length}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px">${thisMonthActive.length} active &nbsp;·&nbsp; ${thisMonthTasks.filter(t=>t._category==='Closed').length} closed</div>
+      </div>
+      ${activeYear === 2026 ? `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px">2026 Progress</div>
+        <div style="font-size:28px;font-weight:800;color:var(--closed)">${total ? Math.round(clCount/total*100) : 0}%</div>
+        <div style="height:4px;background:var(--border);border-radius:2px;margin-top:8px;overflow:hidden"><div style="height:100%;background:var(--closed);border-radius:2px;width:${total?clCount/total*100:0}%"></div></div>
+      </div>` : ''}
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px">Status Breakdown</div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-top:4px">
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:2px;background:var(--new);flex-shrink:0"></div><div style="font-size:12px;color:var(--text2);flex:1">New</div><div style="font-size:12px;font-weight:700;color:var(--new)">${newCount}</div></div>
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:2px;background:var(--inprogress);flex-shrink:0"></div><div style="font-size:12px;color:var(--text2);flex:1">In Progress</div><div style="font-size:12px;font-weight:700;color:var(--inprogress)">${inpCount}</div></div>
+          <div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:2px;background:var(--closed);flex-shrink:0"></div><div style="font-size:12px;color:var(--text2);flex:1">Closed</div><div style="font-size:12px;font-weight:700;color:var(--closed)">${clCount}</div></div>
+        </div>
+      </div>
+    </div>
+
+
+    ${activeYear === 2026 ? `
+
+    <!-- 2026: IN PROGRESS -->
+    ${(activeStatus === 'all' || activeStatus === 'InProgress') ? `
+    <div style="margin-bottom:32px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+        <div style="width:4px;height:22px;background:var(--inprogress);border-radius:2px"></div>
+        <div>
+          <div style="font-size:16px;font-weight:800;color:var(--text)">Active Tasks — ${focusMonthLabel}</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:1px">${(thisMonthActive.length > 0 ? thisMonthActive : activeTasks).length} task${(thisMonthActive.length > 0 ? thisMonthActive : activeTasks).length !== 1 ? 's' : ''} in progress${thisMonthActive.length === 0 && activeTasks.length > 0 ? ' — showing all active' : ''}</div>
+        </div>
+      </div>
+      ${(thisMonthActive.length > 0 ? thisMonthActive : activeTasks).length === 0
+        ? `<div class="empty-state" style="padding:24px"><div class="empty-icon">✅</div><div class="empty-title">No active tasks</div></div>`
+        : `<div style="display:flex;flex-direction:column;gap:16px">
+            ${(thisMonthActive.length > 0 ? thisMonthActive : activeTasks).map(t => activeTaskDetailHTML(t)).join('')}
+          </div>`}
+      ${thisMonthActive.length > 0 && activeTasks.length > thisMonthActive.length ? `
+      <div style="margin-top:24px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <div style="width:4px;height:22px;background:var(--accent);border-radius:2px"></div>
+          <div><div style="font-size:15px;font-weight:700;color:var(--text)">Other Active Tasks</div><div style="font-size:12px;color:var(--text3);margin-top:1px">From other months in 2026</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          ${activeTasks.filter(t => !thisMonthActive.find(x => x._item_id === t._item_id)).map(t => activeTaskDetailHTML(t)).join('')}
+        </div>
+      </div>` : ''}
+    </div>` : ''}
+
+    <!-- 2026: NEW / PENDING — only when explicitly selected -->
+    ${(activeStatus === 'NotStarted') ? (() => {
+      const newTasks = tasks.filter(t => t._category === 'NotStarted');
+      return newTasks.length === 0 ? '' : `
+      <div style="margin-bottom:32px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+          <div style="width:4px;height:22px;background:var(--new);border-radius:2px"></div>
+          <div>
+            <div style="font-size:16px;font-weight:800;color:var(--text)">New / Queued</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:1px">${newTasks.length} task${newTasks.length !== 1 ? 's' : ''} not yet started</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px">
+          ${newTasks.map(t => taskCardHTML(t)).join('')}
+        </div>
+      </div>`;
+    })() : ''}
+
+    <!-- 2026: CLOSED -->
+    ${activeStatus === 'Closed' ? (() => {
+      const closedTasks = tasks.filter(t => t._category === 'Closed');
+      return closedTasks.length === 0 ? `<div class="empty-state" style="padding:32px"><div class="empty-icon">📭</div><div class="empty-title">No closed tasks in 2026</div></div>` : `
+      <div style="margin-bottom:32px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+          <div style="width:4px;height:22px;background:var(--closed);border-radius:2px"></div>
+          <div>
+            <div style="font-size:16px;font-weight:800;color:var(--text)">Closed Tasks</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:1px">${closedTasks.length} completed</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          ${closedTasks.map(t => closedTaskDetailHTML(t)).join('')}
+        </div>
+      </div>`;
+    })() : ''}
+
+    ` : `
+    <!-- 2025: COMPLETED WORK -->
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <div style="width:4px;height:22px;background:var(--closed);border-radius:2px"></div>
+        <div>
+          <div style="font-size:16px;font-weight:800;color:var(--text)">Completed Work — 2025</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:1px">${clCount} task${clCount !== 1 ? 's' : ''} closed &nbsp;·&nbsp; what was delivered</div>
+        </div>
+      </div>
+      ${clCount === 0
+        ? `<div class="empty-state" style="padding:32px"><div class="empty-icon">📭</div><div class="empty-title">No closed tasks in 2025</div></div>`
+        : `<div style="display:flex;flex-direction:column;gap:16px">
+            ${tasks.filter(t => t._category === 'Closed').map(t => closedTaskDetailHTML(t)).join('')}
+          </div>`}
+    </div>
+    `}
+  `;
+}
+
+function renderYearMonth() {
+  const tasks = filteredTasks();
+  const content = document.getElementById('content');
+
+  if (tasks.length === 0) {
+    content.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">No tasks match your filters</div></div>';
+    return;
+  }
+
+  // Build year → month → tasks map
+  const byYear = {};
+  tasks.forEach(t => {
+    const y = String(getYear(t));
+    const m = getMonthIdx(t);
+    if (!byYear[y]) byYear[y] = {};
+    if (!byYear[y][m]) byYear[y][m] = [];
+    byYear[y][m].push(t);
+  });
+
+  const years = Object.keys(byYear).sort((a,b) => b - a);
+
+  // Default selections — sync with activeYear
+  if (!selectedYear || !byYear[selectedYear]) selectedYear = String(activeYear) in byYear ? String(activeYear) : years[0];
+  const monthsInYear = Object.keys(byYear[selectedYear] || {}).map(Number).sort((a,b) => a - b);
+  if (selectedMonth === null || !byYear[selectedYear][selectedMonth]) selectedMonth = monthsInYear[monthsInYear.length - 1];
+
+  const tasksToShow = (byYear[selectedYear] && byYear[selectedYear][selectedMonth]) || [];
+
+  content.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:6px">
+        <button onclick="switchYear(2026);changeYear('2026')" style="padding:7px 18px;border-radius:8px;border:1px solid ${activeYear===2026?'var(--accent)':'var(--border)'};background:${activeYear===2026?'var(--accent)':'var(--surface2)'};color:${activeYear===2026?'#fff':'var(--text2)'};font-size:13px;font-weight:700;cursor:pointer">2026</button>
+        <button onclick="switchYear(2025);changeYear('2025')" style="padding:7px 18px;border-radius:8px;border:1px solid ${activeYear===2025?'var(--accent)':'var(--border)'};background:${activeYear===2025?'var(--accent)':'var(--surface2)'};color:${activeYear===2025?'#fff':'var(--text2)'};font-size:13px;font-weight:700;cursor:pointer">2025</button>
+      </div>
+      <div style="width:1px;height:24px;background:var(--border)"></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <label style="font-size:12px;color:var(--text3);font-weight:600">MONTH</label>
+        <select id="month-select" onchange="changeMonth(parseInt(this.value))" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 32px 7px 12px;font-size:13px;font-weight:600;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22 viewBox=%220 0 10 6%22><path d=%22M0 0l5 6 5-6z%22 fill=%22%2294a3b8%22/></svg>');background-repeat:no-repeat;background-position:right 10px center">
+          ${monthsInYear.map(m => `<option value="${m}" ${m === selectedMonth ? 'selected' : ''}>${MONTHS[m]}</option>`).join('')}
+        </select>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <label style="font-size:12px;color:var(--text3);font-weight:600">MONTH</label>
+        <select id="month-select" onchange="changeMonth(parseInt(this.value))" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 32px 7px 12px;font-size:13px;font-weight:600;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22 viewBox=%220 0 10 6%22><path d=%22M0 0l5 6 5-6z%22 fill=%22%2394a3b8%22/></svg>');background-repeat:no-repeat;background-position:right 10px center">
+          ${monthsInYear.map(m => `<option value="${m}" ${m === selectedMonth ? 'selected' : ''}>${MONTHS[m]}</option>`).join('')}
+        </select>
+      </div>
+      <div style="margin-left:8px;font-size:13px;color:var(--text3)">
+        <span style="color:var(--accent2);font-weight:700">${tasksToShow.length}</span> task${tasksToShow.length !== 1 ? 's' : ''} in ${MONTHS[selectedMonth]} ${selectedYear}
+      </div>
+    </div>
+
+    ${tasksToShow.length === 0
+      ? '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">No tasks for this period</div></div>'
+      : `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px">
+          ${tasksToShow.map(t => taskCardHTML(t)).join('')}
+        </div>`
+    }
+  `;
+}
+
+function changeYear(y) {
+  activeYear = parseInt(y);
+  selectedYear = y;
+  selectedMonth = null;
+  updateKPIs();
+  renderYearMonth();
+}
+
+function changeMonth(m) {
+  selectedMonth = m;
+  renderYearMonth();
+}
+
+function renderAllTasks() {
+  const tasks = filteredTasks();
+  const content = document.getElementById('content');
+
+  if (tasks.length === 0) {
+    content.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">No tasks match your filters</div></div>';
+    return;
+  }
+
+  const sorted = [...tasks].sort((a,b) => new Date(b._created_at) - new Date(a._created_at));
+
+  content.innerHTML = `
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Assignee</th>
+            <th>Requester</th>
+            <th>Created</th>
+            <th>Modified</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${sorted.map(t => `
+            <tr onclick="openModal('${t._item_id}')">
+              <td class="td-id">${t._item_id}</td>
+              <td class="td-name"><span class="td-name-text" title="${escHtml(t.Name)}">${escHtml(cleanName(t.Name))}</span></td>
+              <td><span class="status-badge ${getStatusClass(t._category)}">${cleanStatus(t._status_name)}</span></td>
+              <td><span class="priority-badge ${getPriorityClass(t._priority_name)}">${t._priority_name || '—'}</span></td>
+              <td class="td-date">${t.AssignedTo?.Name || '—'}</td>
+              <td class="td-date">${t.Requester?.Name || '—'}</td>
+              <td class="td-date">${formatDate(t._created_at)}</td>
+              <td class="td-date">${formatDate(t._modified_at)}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function taskCardHTML(t) {
+  const detail = detailCache[t._item_id] || {};
+  const subTotal = t._total_subitem_count || 0;
+  const subDone = t._completed_subitem_count || 0;
+  const subPct = subTotal ? Math.round(subDone/subTotal*100) : 0;
+  const sc = getStatusClass(t._category);
+
+  return `
+    <div class="task-card" onclick="openModal('${t._item_id}')">
+      <div class="task-id-row">
+        <span class="task-id">${t._item_id}</span>
+        <span class="status-badge ${sc}">${cleanStatus(t._status_name)}</span>
+        <span class="priority-badge ${getPriorityClass(t._priority_name)}" style="margin-left:auto">${t._priority_name || '—'}</span>
+      </div>
+      <div class="task-name">${escHtml(cleanName(t.Name))}</div>
+      <div class="task-meta">
+        <span class="task-meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/></svg>
+          ${t.AssignedTo?.Name || '—'}
+        </span>
+        <span class="task-meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          ${formatDate(t._created_at)}
+        </span>
+        ${detail.QA_Stream ? `<span class="task-meta-item" style="margin-left:auto;color:var(--accent2);font-weight:600">${detail.QA_Stream}</span>` : ''}
+      </div>
+      ${subTotal ? `
+        <div class="subitem-bar">
+          <div class="subitem-progress-text">${subDone}/${subTotal} subtasks done</div>
+          <div class="subitem-progress-track"><div class="subitem-progress-fill" style="width:${subPct}%"></div></div>
+        </div>` : ''}
+    </div>`;
+}
+
+function activeTaskDetailHTML(t) {
+  const detail = detailCache[t._item_id] || {};
+  const subitems = detail.Subitem || t.Subitem || [];
+  const subTotal = detail._total_subitem_count || t._total_subitem_count || subitems.length;
+  const subDone = detail._completed_subitem_count || t._completed_subitem_count || subitems.filter(s => s._state_id === 'State_Done').length;
+  const subInProgress = subitems.filter(s => s._state_id === 'State_In_Progress').length;
+  const subPct = subTotal ? Math.round(subDone / subTotal * 100) : 0;
+  const startDate = t._start_date || detail._start_date;
+
+  // Days since start
+  let daysRunning = null;
+  if (startDate) {
+    const diff = Date.now() - new Date(startDate).getTime();
+    daysRunning = Math.max(0, Math.floor(diff / 86400000));
+  }
+
+  const progressColor = subPct === 100 ? 'var(--closed)' : subPct >= 50 ? 'var(--inprogress)' : 'var(--new)';
+
+  return `
+    <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--inprogress);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color 0.2s" onclick="openModal('${t._item_id}')" onmouseenter="this.style.borderColor='var(--accent)'" onmouseleave="this.style.borderColor='var(--border)';this.style.borderLeftColor='var(--inprogress)'">
+
+      <!-- Header row -->
+      <div style="padding:16px 20px 12px;display:flex;align-items:flex-start;gap:12px">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="font-family:monospace;font-size:11px;font-weight:700;color:var(--accent2)">${t._item_id}</span>
+            <span class="priority-badge ${getPriorityClass(t._priority_name)}">${t._priority_name || '—'}</span>
+            ${detail.QA_Stream ? `<span style="font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(99,102,241,0.12);color:var(--accent2);font-weight:600">${detail.QA_Stream}</span>` : ''}
+          </div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);line-height:1.4">${escHtml(cleanName(t.Name))}</div>
+        </div>
+        <!-- Big progress circle -->
+        <div style="flex-shrink:0;text-align:center">
+          <div style="font-size:22px;font-weight:900;color:${progressColor};line-height:1">${subPct}%</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">complete</div>
+        </div>
+      </div>
+
+      <!-- Start date + days running -->
+      <div style="padding:0 20px 12px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span style="font-size:12px;color:var(--text3)">Started</span>
+          <span style="font-size:12px;font-weight:600;color:var(--text)">${startDate ? formatDate(startDate) : '—'}</span>
+        </div>
+        ${daysRunning !== null ? `
+        <div style="display:flex;align-items:center;gap:6px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span style="font-size:12px;font-weight:600;color:var(--inprogress)">${daysRunning} day${daysRunning !== 1 ? 's' : ''} running</span>
+        </div>` : ''}
+        ${subTotal > 0 ? `
+        <div style="display:flex;align-items:center;gap:6px;margin-left:auto">
+          <span style="font-size:12px;color:var(--text3)">${subDone} done</span>
+          ${subInProgress > 0 ? `<span style="font-size:12px;color:var(--inprogress)">· ${subInProgress} in progress</span>` : ''}
+          <span style="font-size:12px;color:var(--text3)">· ${subTotal - subDone - subInProgress} not started</span>
+        </div>` : ''}
+      </div>
+
+      <!-- Progress bar -->
+      ${subTotal > 0 ? `
+      <div style="padding:0 20px 14px">
+        <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;position:relative">
+          <div style="position:absolute;left:0;top:0;height:100%;background:${progressColor};border-radius:3px;width:${subPct}%;transition:width 0.6s ease"></div>
+          ${subInProgress > 0 ? `<div style="position:absolute;left:${subPct}%;top:0;height:100%;background:rgba(59,130,246,0.35);border-radius:3px;width:${Math.round(subInProgress/subTotal*100)}%"></div>` : ''}
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px">
+          <span style="font-size:10px;color:var(--text3)">${subDone} / ${subTotal} subtasks</span>
+          <span style="font-size:10px;color:${progressColor};font-weight:600">${subPct}%</span>
+        </div>
+      </div>` : ''}
+
+      <!-- Subtask items -->
+      ${subitems.length > 0 ? `
+      <div style="border-top:1px solid var(--border);padding:12px 20px;display:flex;flex-direction:column;gap:7px">
+        ${subitems.map(s => {
+          const isDone = s._state_id === 'State_Done';
+          const isWip = s._state_id === 'State_In_Progress';
+          const dotColor = isDone ? 'var(--closed)' : isWip ? 'var(--inprogress)' : 'var(--text3)';
+          const textStyle = isDone ? 'color:var(--text3);text-decoration:line-through' : isWip ? 'color:var(--text)' : 'color:var(--text2)';
+          return `
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:7px;height:7px;border-radius:50%;background:${dotColor};flex-shrink:0"></div>
+              <div style="flex:1;font-size:12px;${textStyle};line-height:1.4">${escHtml(s._subitem_title || '')}</div>
+              ${isWip ? `<span style="font-size:10px;padding:1px 7px;border-radius:4px;background:var(--inprogress-bg);color:var(--inprogress);font-weight:600;white-space:nowrap">In Progress</span>` : ''}
+              ${isDone ? `<span style="font-size:10px;padding:1px 7px;border-radius:4px;background:var(--closed-bg);color:var(--closed);font-weight:600;white-space:nowrap">Done</span>` : ''}
+            </div>`;
+        }).join('')}
+      </div>` : ''}
+    </div>`;
+}
+
+function closedTaskDetailHTML(t) {
+  const detail = detailCache[t._item_id] || {};
+  const subitems = detail.Subitem || t.Subitem || [];
+  const subTotal = detail._total_subitem_count || t._total_subitem_count || subitems.length;
+  const subDone = detail._completed_subitem_count || t._completed_subitem_count || subitems.filter(s => s._state_id === 'State_Done').length;
+  const startDate = t._start_date || detail._start_date;
+  const closedDate = t._modified_at;
+
+  const doneSubs = subitems.filter(s => s._state_id === 'State_Done');
+  const allSubs = subitems;
+
+  return `
+    <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--closed);border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color 0.2s" onclick="openModal('${t._item_id}')" onmouseenter="this.style.borderColor='var(--closed)'" onmouseleave="this.style.borderColor='var(--border)';this.style.borderLeftColor='var(--closed)'">
+
+      <!-- Header -->
+      <div style="padding:14px 20px 10px;display:flex;align-items:flex-start;gap:12px">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+            <span style="font-family:monospace;font-size:11px;font-weight:700;color:var(--accent2)">${t._item_id}</span>
+            <span style="font-size:10px;padding:2px 8px;border-radius:4px;background:var(--closed-bg);color:var(--closed);font-weight:700">✓ Closed</span>
+            <span class="priority-badge ${getPriorityClass(t._priority_name)}">${t._priority_name || '—'}</span>
+            ${detail.QA_Stream ? `<span style="font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(99,102,241,0.12);color:var(--accent2);font-weight:600">${detail.QA_Stream}</span>` : ''}
+          </div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);line-height:1.4">${escHtml(cleanName(t.Name))}</div>
+        </div>
+      </div>
+
+      <!-- Dates row -->
+      <div style="padding:0 20px 12px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span style="font-size:12px;color:var(--text3)">Started</span>
+          <span style="font-size:12px;font-weight:600;color:var(--text)">${startDate ? formatDate(startDate) : '—'}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--closed)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          <span style="font-size:12px;color:var(--text3)">Closed</span>
+          <span style="font-size:12px;font-weight:600;color:var(--closed)">${formatDate(closedDate)}</span>
+        </div>
+        ${detail.Squad ? `<span style="font-size:11px;color:var(--text3);margin-left:auto">${detail.Squad}</span>` : ''}
+      </div>
+
+      ${detail.Description || detail.Summary ? `
+      <div style="padding:0 20px 12px">
+        <div style="font-size:12px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px 12px;border-left:2px solid var(--closed);line-height:1.5">${escHtml(detail.Description || detail.Summary)}</div>
+      </div>` : ''}
+
+      <!-- What was done -->
+      ${allSubs.length > 0 ? `
+      <div style="border-top:1px solid var(--border);padding:12px 20px">
+        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">
+          What Was Done &nbsp;·&nbsp; <span style="color:var(--closed)">${doneSubs.length}</span> / ${allSubs.length} completed
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          ${allSubs.map(s => {
+            const isDone = s._state_id === 'State_Done';
+            const isWip = s._state_id === 'State_In_Progress';
+            return `
+              <div style="display:flex;align-items:flex-start;gap:10px">
+                <div style="margin-top:3px;width:14px;height:14px;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;${isDone ? 'background:var(--closed)' : 'background:var(--surface2);border:1px solid var(--border)'}">
+                  ${isDone ? `<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>` : ''}
+                </div>
+                <div style="flex:1;font-size:12px;${isDone ? 'color:var(--text2)' : isWip ? 'color:var(--text)' : 'color:var(--text3)'};line-height:1.4">${escHtml(s._subitem_title || '')}</div>
+                ${isWip ? `<span style="font-size:10px;padding:1px 7px;border-radius:4px;background:var(--inprogress-bg);color:var(--inprogress);font-weight:600;white-space:nowrap;flex-shrink:0">In Progress</span>` : ''}
+              </div>`;
+          }).join('')}
+        </div>
+      </div>` : ''}
+    </div>`;
+}
+
+function openModal(itemId) {
+  const t = allTasks.find(x => x._item_id === itemId);
+  if (!t) return;
+  const detail = detailCache[itemId] || {};
+  const sc = getStatusClass(t._category);
+  const pc = getPriorityClass(t._priority_name);
+
+  document.getElementById('modal-id').textContent = itemId;
+  document.getElementById('modal-title').textContent = cleanName(t.Name);
+  document.getElementById('modal-badges').innerHTML = '';
+
+  const subitems = (detail.Subitem || t.Subitem || []);
+  const subTotal = detail._total_subitem_count || t._total_subitem_count || subitems.length;
+  const subDone = detail._completed_subitem_count || t._completed_subitem_count || subitems.filter(s => s._state_id === 'State_Done').length;
+  const startDate = t._start_date || detail._start_date;
+
+  document.getElementById('modal-body').innerHTML = `
+    ${startDate ? `
+    <div class="modal-section">
+      <div class="modal-section-title">Start Date</div>
+      <div style="font-size:15px;font-weight:600;color:var(--text)">${formatDate(startDate)}</div>
+    </div>` : `
+    <div class="modal-section">
+      <div style="font-size:13px;color:var(--text3);font-style:italic">No start date set</div>
+    </div>`}
+
+    ${subitems.length > 0 ? `
+    <div class="modal-section">
+      <div class="modal-section-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>Subtasks</span>
+        <span style="font-size:12px;color:var(--text3);font-weight:400">${subDone} / ${subTotal} done</span>
+      </div>
+      <div style="height:4px;background:var(--border);border-radius:2px;margin-bottom:14px;overflow:hidden">
+        <div style="height:100%;background:var(--inprogress);border-radius:2px;width:${subTotal ? subDone/subTotal*100 : 0}%;transition:width 0.5s"></div>
+      </div>
+      <div class="subitem-list">
+        ${subitems.map(s => {
+          let dotClass = 'notstarted';
+          if (s._state_id === 'State_Done') dotClass = 'done';
+          else if (s._state_id === 'State_In_Progress') dotClass = 'inprogress';
+          return `
+            <div class="subitem-item">
+              <div class="subitem-state-dot ${dotClass}"></div>
+              <div class="subitem-item-text">${escHtml(s._subitem_title || '')}</div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0">
+                <div class="subitem-item-id">${s._item_id || ''}</div>
+                <div class="subitem-state-label">${s._state_name || ''}</div>
+              </div>
+            </div>`;
+        }).join('')}
+      </div>
+    </div>` : `
+    <div class="modal-section">
+      <div class="modal-section-title">Subtasks</div>
+      <div style="font-size:13px;color:var(--text3);font-style:italic">No subtasks</div>
+    </div>`}
+  `;
+
+  document.getElementById('modal-backdrop').classList.remove('hidden');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal-backdrop')) closeModalDirect();
+}
+function closeModalDirect() {
+  document.getElementById('modal-backdrop').classList.add('hidden');
+}
+
+function cleanName(name) {
+  if (!name) return '';
+  return name.replace(/^\[\s*\]\s*/, '').trim();
+}
+
+function cleanStatus(s) {
+  if (!s) return '—';
+  return s.replace(/[\u{1F300}-\u{1FFFF}]/gu, '').replace(/[☀-⛿✀-➿]/g, '').trim();
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type || '');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Keyboard support
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModalDirect();
+});
+
+// Auto-load on start
+loadData();
+</script>
+</body>
+</html>
